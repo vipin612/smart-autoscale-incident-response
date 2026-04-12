@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "jest --coverage",
-    "lint": "eslint src/"
+    "test": "jest --forceExit --detectOpenHandles",
+    "lint": "eslint src/ --ext .js"
   },
   "keywords": ["devops", "kubernetes", "autoscaling", "prometheus", "monitoring"],
   "author": "DevOps Engineer",
@@ -19,9 +19,12 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.2",
-    "jest": "^29.7.0",
-    "supertest": "^6.3.4",
-    "eslint": "^8.57.0"
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/__tests__/**/*.test.js"],
+    "testTimeout": 15000
   },
   "engines": {
     "node": ">=18.0.0"

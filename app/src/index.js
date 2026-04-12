@@ -169,17 +169,18 @@ app.use((err, req, res, next) => {
 });
 
 // ─── Start ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, HOST, () => {
+const server = app.listen(PORT, HOST, () => {
   logger.info(`Server started`, { port: PORT, host: HOST, env: process.env.NODE_ENV });
 });
 
 // Graceful shutdown
 const shutdown = (signal) => {
   logger.info(`${signal} received, shutting down gracefully`);
-  process.exit(0);
+  server.close(() => process.exit(0));
 };
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-module.exports = app;
+// Export server for testing
+module.exports = server;
