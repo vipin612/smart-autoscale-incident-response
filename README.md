@@ -541,18 +541,7 @@ kubectl get hpa -n smartscale
 
 ---
 
-## 📸 Add Your Screenshots Here
 
-> Take screenshots while the project is running and add them to this section. Recruiters love visuals.
->
-> Suggested screenshots:
-> - Web dashboard UI at `http://IP:30080`
-> - `kubectl get hpa -n smartscale -w` showing pods scaling 2 → 6
-> - Grafana dashboard with live data
-> - Prometheus targets page showing app as UP
-> - GitHub Actions showing green pipeline
-
----
 
 <div align="center">
 
