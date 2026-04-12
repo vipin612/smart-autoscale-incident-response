@@ -1,0 +1,45 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: smartscale-hpa
+  namespace: smartscale
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: smartscale-app
+
+  # Replica bounds
+  minReplicas: 2
+  maxReplicas: 10
+
+  metrics:
+    # Scale up when avg CPU across pods exceeds 50%
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+
+    # Also track memory (informational, adjust threshold as needed)
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 70
+
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 15    # React fast to spikes
+      policies:
+        - type: Pods
+          value: 2                       # Add max 2 pods per period
+          periodSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 300   # Wait 5 min before scaling down (avoid flapping)
+      policies:
+        - type: Pods
+          value: 1                       # Remove 1 pod at a time
+          periodSeconds: 60

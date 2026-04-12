@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartScale — Incident Response System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c12;--bg2:#10131c;--bg3:#161b28;--bg4:#1e2535;
+  --border:#242d42;--border2:#2e3a55;
+  --text:#dde4f8;--text2:#7a8ab0;--text3:#3d4d70;
+  --green:#00e5a0;--green2:#00b87a;--green3:#003d2a;
+  --blue:#4da6ff;--blue2:#1a7acc;--blue3:#0a2244;
+  --amber:#ffb84d;--amber3:#3d2a00;
+  --red:#ff4d6a;--red3:#3d0010;
+  --purple:#9d77ff;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;min-height:100vh}
+
+/* ── Top bar ── */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.logo-text{font-size:16px;font-weight:700;letter-spacing:-0.5px}
+.logo-sub{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:20px}
+.live{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green)}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.clock{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text2)}
+.pod-badge{background:var(--green3);color:var(--green);border:1px solid var(--green2);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace}
+
+/* ── Layout ── */
+.page{max-width:1200px;margin:0 auto;padding:24px}
+
+/* ── Stat cards ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:border-color 0.3s}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.stat.green::after{background:var(--green)}
+.stat.blue::after{background:var(--blue)}
+.stat.amber::after{background:var(--amber)}
+.stat.red::after{background:var(--red)}
+.stat-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text2);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px}
+.stat-value{font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1}
+.stat-value.green{color:var(--green)}
+.stat-value.blue{color:var(--blue)}
+.stat-value.amber{color:var(--amber)}
+.stat-value.red{color:var(--red)}
+.stat-sub{font-size:12px;color:var(--text2);margin-top:6px;font-family:'JetBrains Mono',monospace}
+
+/* ── Cards ── */
+.row{display:grid;gap:16px;margin-bottom:16px}
+.row.two{grid-template-columns:1fr 1fr}
+.row.three{grid-template-columns:2fr 1fr 1fr}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600;color:var(--text)}
+.card-badge{font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:20px;background:var(--bg4);color:var(--text2);border:1px solid var(--border2)}
+.card-badge.green{background:var(--green3);color:var(--green);border-color:var(--green2)}
+.card-badge.red{background:var(--red3);color:var(--red)}
+.card-badge.amber{background:var(--amber3);color:var(--amber)}
+
+/* ── Endpoints ── */
+.endpoint-list{display:flex;flex-direction:column;gap:8px}
+.endpoint{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all 0.15s;text-decoration:none}
+.endpoint:hover{border-color:var(--border2);background:var(--bg4)}
+.endpoint-left{display:flex;align-items:center;gap:10px}
+.method{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:3px 8px;border-radius:4px;background:var(--green3);color:var(--green);border:1px solid var(--green2);min-width:40px;text-align:center}
+.path{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text)}
+.desc{font-size:12px;color:var(--text2)}
+.endpoint-status{width:8px;height:8px;border-radius:50%;background:var(--green)}
+
+/* ── Pod list ── */
+.pod-list{display:flex;flex-direction:column;gap:8px}
+.pod{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)}
+.pod-left{display:flex;align-items:center;gap:10px}
+.pod-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+.pod-name{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text)}
+.pod-cpu{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green)}
+
+/* ── HPA bar ── */
+.hpa-section{display:flex;flex-direction:column;gap:12px}
+.hpa-metric{display:flex;flex-direction:column;gap:6px}
+.hpa-row{display:flex;justify-content:space-between;font-size:12px}
+.hpa-key{color:var(--text2)}
+.hpa-val{font-family:'JetBrains Mono',monospace;color:var(--text)}
+.bar-bg{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.bar-fg{height:6px;border-radius:3px;transition:width 0.6s ease}
+
+/* ── Alert log ── */
+.alert-log{display:flex;flex-direction:column;gap:0}
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.alert-item:last-child{border-bottom:none}
+.alert-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.alert-dot.crit{background:var(--red)}
+.alert-dot.warn{background:var(--amber)}
+.alert-dot.info{background:var(--blue)}
+.alert-dot.ok{background:var(--green)}
+.alert-body{flex:1}
+.alert-name{font-size:13px;font-weight:500;color:var(--text)}
+.alert-detail{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text2);margin-top:2px}
+.alert-time{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+
+/* ── Load test button ── */
+.btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{padding:9px 18px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:500;cursor:pointer;transition:all 0.15s}
+.btn:hover{background:var(--bg4);border-color:var(--green2)}
+.btn.primary{background:var(--green3);color:var(--green);border-color:var(--green2)}
+.btn.primary:hover{background:var(--green2);color:#000}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn.danger:hover{background:var(--red3)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn.loading{opacity:0.7;cursor:wait}
+
+/* ── Terminal ── */
+.terminal{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;height:130px;overflow-y:auto;line-height:1.9}
+.tl{display:block}
+.tl .ts{color:var(--text3)}
+.tl .ok{color:var(--green)}
+.tl .warn{color:var(--amber)}
+.tl .err{color:var(--red)}
+.tl .info{color:var(--blue)}
+.tl .dim{color:var(--text2)}
+
+/* ── Info box ── */
+.info-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);line-height:2}
+.info-box .key{color:var(--text3)}
+.info-box .val{color:var(--text)}
+.info-box .highlight{color:var(--green)}
+
+/* ── Footer ── */
+.footer{text-align:center;padding:32px;color:var(--text3);font-size:12px;font-family:'JetBrains Mono',monospace}
+.footer a{color:var(--blue);text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18"><polyline points="1,14 5,7 9,10 13,4 17,7"/><circle cx="17" cy="7" r="2" fill="white" stroke="none"/></svg>
+    </div>
+    <div>
+      <div class="logo-text">SmartScale</div>
+      <div class="logo-sub">INCIDENT RESPONSE SYSTEM</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="live"><div class="live-dot"></div>LIVE</div>
+    <div class="pod-badge" id="pod-badge">● 2 pods</div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Stat cards -->
+  <div class="stats">
+    <div class="stat green">
+      <div class="stat-label">Pod Name</div>
+      <div class="stat-value green" id="stat-pod" style="font-size:16px;word-break:break-all">loading...</div>
+      <div class="stat-sub">current instance</div>
+    </div>
+    <div class="stat blue">
+      <div class="stat-label">Uptime</div>
+      <div class="stat-value blue" id="stat-uptime">--</div>
+      <div class="stat-sub">seconds running</div>
+    </div>
+    <div class="stat amber">
+      <div class="stat-label">Memory (RSS)</div>
+      <div class="stat-value amber" id="stat-mem">--</div>
+      <div class="stat-sub">MB used</div>
+    </div>
+    <div class="stat green">
+      <div class="stat-label">Environment</div>
+      <div class="stat-value green" id="stat-env" style="font-size:18px">--</div>
+      <div class="stat-sub">Node.js <span id="stat-node">--</span></div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="row two" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Response time history</div>
+        <div class="card-badge green" id="rtt-badge">-- ms</div>
+      </div>
+      <div style="position:relative;height:160px">
+        <canvas id="rtt-chart" role="img" aria-label="Response time chart">Response time history.</canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Request count per endpoint</div>
+        <div class="card-badge" id="req-badge">live</div>
+      </div>
+      <div style="position:relative;height:160px">
+        <canvas id="req-chart" role="img" aria-label="Request count bar chart">Request counts.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Middle row -->
+  <div class="row three" style="margin-bottom:16px">
+
+    <!-- Endpoints -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">API endpoints</div>
+        <div class="card-badge green">all healthy</div>
+      </div>
+      <div class="endpoint-list">
+        <a class="endpoint" href="/" target="_blank">
+          <div class="endpoint-left">
+            <span class="method">GET</span>
+            <div><div class="path">/</div><div class="desc">Service info</div></div>
+          </div>
+          <div class="endpoint-status"></div>
+        </a>
+        <a class="endpoint" href="/status" target="_blank">
+          <div class="endpoint-left">
+            <span class="method">GET</span>
+            <div><div class="path">/status</div><div class="desc">Memory & process</div></div>
+          </div>
+          <div class="endpoint-status"></div>
+        </a>
+        <a class="endpoint" href="/healthz" target="_blank">
+          <div class="endpoint-left">
+            <span class="method">GET</span>
+            <div><div class="path">/healthz</div><div class="desc">Liveness probe</div></div>
+          </div>
+          <div class="endpoint-status"></div>
+        </a>
+        <a class="endpoint" href="/ready" target="_blank">
+          <div class="endpoint-left">
+            <span class="method">GET</span>
+            <div><div class="path">/ready</div><div class="desc">Readiness probe</div></div>
+          </div>
+          <div class="endpoint-status"></div>
+        </a>
+        <a class="endpoint" href="/metrics" target="_blank">
+          <div class="endpoint-left">
+            <span class="method">GET</span>
+            <div><div class="path">/metrics</div><div class="desc">Prometheus metrics</div></div>
+          </div>
+          <div class="endpoint-status"></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- HPA status -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Autoscaler (HPA)</div>
+        <div class="card-badge green" id="hpa-badge">active</div>
+      </div>
+      <div class="hpa-section">
+        <div style="text-align:center;padding:10px 0">
+          <div style="font-size:48px;font-weight:700;color:var(--purple);line-height:1" id="hpa-replicas">2</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px;font-family:'JetBrains Mono',monospace">active replicas</div>
+        </div>
+        <div class="hpa-metric">
+          <div class="hpa-row"><span class="hpa-key">Min pods</span><span class="hpa-val">2</span></div>
+          <div class="bar-bg"><div class="bar-fg" style="width:20%;background:var(--purple)"></div></div>
+        </div>
+        <div class="hpa-metric">
+          <div class="hpa-row"><span class="hpa-key">Max pods</span><span class="hpa-val">10</span></div>
+          <div class="bar-bg"><div class="bar-fg" style="width:100%;background:var(--border2)"></div></div>
+        </div>
+        <div class="hpa-metric">
+          <div class="hpa-row"><span class="hpa-key">Scale trigger</span><span class="hpa-val">CPU &gt; 50%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System info -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">System info</div>
+      </div>
+      <div class="info-box" id="sysinfo">
+        <span class="key">pod:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="val" id="inf-pod">loading...</span><br>
+        <span class="key">node:&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="val" id="inf-node">--</span><br>
+        <span class="key">env:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="val" id="inf-env">--</span><br>
+        <span class="key">heap:&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="val" id="inf-heap">--</span><span class="dim"> MB</span><br>
+        <span class="key">uptime:&nbsp;&nbsp;</span><span class="highlight" id="inf-uptime">--</span><span class="dim"> s</span><br>
+        <span class="key">pid:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="val" id="inf-pid">--</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load test + log row -->
+  <div class="row two">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Load simulator</div>
+        <div class="card-badge" id="load-badge">idle</div>
+      </div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">
+        Sends real CPU-burning requests to <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px">/load</code>.
+        In Kubernetes, this triggers the HPA to scale up pods when CPU exceeds 50%.
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Duration (ms)</label>
+          <select id="duration-sel" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:13px">
+            <option value="2000">2 seconds</option>
+            <option value="5000" selected>5 seconds</option>
+            <option value="10000">10 seconds</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Concurrent requests</label>
+          <select id="concurrent-sel" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:13px">
+            <option value="1">1 request</option>
+            <option value="5" selected>5 requests</option>
+            <option value="10">10 requests</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="load-btn" onclick="runLoad()">Run load test</button>
+        <button class="btn" onclick="pingHealth()">Ping /healthz</button>
+        <button class="btn" onclick="fetchStatus()">Refresh status</button>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text2);font-family:'JetBrains Mono',monospace" id="load-result"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Live request log</div>
+        <div class="card-badge green">streaming</div>
+      </div>
+      <div class="terminal" id="terminal"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  SmartScale Incident Response System &nbsp;·&nbsp;
+  <a href="/metrics" target="_blank">Prometheus metrics</a> &nbsp;·&nbsp;
+  <a href="/healthz" target="_blank">Health check</a> &nbsp;·&nbsp;
+  Built with Node.js + Kubernetes + Prometheus
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const logs = [];
+const rttHistory = [];
+const reqCounts = { '/': 0, '/status': 0, '/healthz': 0, '/load': 0, '/metrics': 0 };
+let rttChart = null, reqChart = null;
+
+// ── Clock ──────────────────────────────────────────────────────────────────
+function updateClock() {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('en-GB', { hour12: false });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Logging ────────────────────────────────────────────────────────────────
+function log(cls, msg) {
+  const ts = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  logs.unshift({ ts, cls, msg });
+  if (logs.length > 60) logs.pop();
+  const el = document.getElementById('terminal');
+  el.innerHTML = logs.slice(0, 20).map(l =>
+    `<span class="tl"><span class="ts">${l.ts}</span> <span class="${l.cls}">${l.msg}</span></span>`
+  ).join('');
+}
+
+// ── Fetch status ───────────────────────────────────────────────────────────
+async function fetchStatus() {
+  const t0 = performance.now();
+  try {
+    const res = await fetch('/status');
+    const rtt = Math.round(performance.now() - t0);
+    const d = await res.json();
+
+    document.getElementById('stat-pod').textContent = d.pod || 'local';
+    document.getElementById('stat-uptime').textContent = d.uptime_seconds ?? '--';
+    document.getElementById('stat-mem').textContent = d.memory?.rss_mb ?? '--';
+    document.getElementById('stat-env').textContent = d.env || '--';
+    document.getElementById('stat-node').textContent = d.node_version || '';
+    document.getElementById('pod-badge').textContent = `● ${d.pod?.split('-').slice(-1)[0] ? '2' : '2'} pods`;
+
+    document.getElementById('inf-pod').textContent = d.pod || 'local';
+    document.getElementById('inf-node').textContent = d.node_version || '--';
+    document.getElementById('inf-env').textContent = d.env || '--';
+    document.getElementById('inf-heap').textContent = d.memory?.heap_used_mb ?? '--';
+    document.getElementById('inf-uptime').textContent = d.uptime_seconds ?? '--';
+    document.getElementById('inf-pid').textContent = d.pid || '--';
+
+    rttHistory.push(rtt);
+    if (rttHistory.length > 20) rttHistory.shift();
+    document.getElementById('rtt-badge').textContent = `${rtt} ms`;
+    updateRttChart();
+
+    reqCounts['/status']++;
+    updateReqChart();
+
+    log('ok', `GET /status → 200 (${rtt}ms) pod=${d.pod}`);
+  } catch (e) {
+    log('err', `GET /status → ERROR: ${e.message}`);
+  }
+}
+
+// ── Ping health ────────────────────────────────────────────────────────────
+async function pingHealth() {
+  const t0 = performance.now();
+  try {
+    const res = await fetch('/healthz');
+    const rtt = Math.round(performance.now() - t0);
+    const d = await res.json();
+    log('ok', `GET /healthz → ${res.status} status=${d.status} (${rtt}ms)`);
+    reqCounts['/healthz']++;
+    updateReqChart();
+  } catch (e) {
+    log('err', `GET /healthz → ERROR: ${e.message}`);
+  }
+}
+
+// ── Load test ──────────────────────────────────────────────────────────────
+async function runLoad() {
+  const btn = document.getElementById('load-btn');
+  const badge = document.getElementById('load-badge');
+  const result = document.getElementById('load-result');
+  const duration = document.getElementById('duration-sel').value;
+  const concurrent = parseInt(document.getElementById('concurrent-sel').value);
+
+  btn.disabled = true;
+  btn.textContent = 'Running...';
+  badge.className = 'card-badge amber';
+  badge.textContent = 'active';
+  result.textContent = '';
+
+  log('warn', `Load test started — ${concurrent}x concurrent, ${duration}ms each`);
+
+  const t0 = performance.now();
+  const promises = Array.from({ length: concurrent }, async (_, i) => {
+    const r0 = performance.now();
+    try {
+      const res = await fetch(`/load?duration=${duration}&intensity=100`);
+      const d = await res.json();
+      const rtt = Math.round(performance.now() - r0);
+      log('warn', `GET /load → 200 pod=${d.pod} (${rtt}ms)`);
+      reqCounts['/load']++;
+      return { ok: true, rtt };
+    } catch (e) {
+      log('err', `GET /load → ERROR: ${e.message}`);
+      return { ok: false };
+    }
+  });
+
+  const results = await Promise.all(promises);
+  const elapsed = Math.round(performance.now() - t0);
+  const ok = results.filter(r => r.ok).length;
+  const avgRtt = Math.round(results.filter(r => r.ok).reduce((s, r) => s + r.rtt, 0) / (ok || 1));
+
+  log('ok', `Load test done — ${ok}/${concurrent} ok, avg ${avgRtt}ms, total ${elapsed}ms`);
+  result.innerHTML = `<span style="color:var(--green)">✓ ${ok}/${concurrent} requests succeeded</span> &nbsp; avg: ${avgRtt}ms &nbsp; total: ${elapsed}ms`;
+
+  badge.className = 'card-badge';
+  badge.textContent = 'idle';
+  btn.disabled = false;
+  btn.textContent = 'Run load test';
+  updateReqChart();
+}
+
+// ── Charts ─────────────────────────────────────────────────────────────────
+function initCharts() {
+  const rttCtx = document.getElementById('rtt-chart');
+  rttChart = new Chart(rttCtx, {
+    type: 'line',
+    data: {
+      labels: Array(20).fill(''),
+      datasets: [{
+        data: Array(20).fill(null),
+        borderColor: '#00e5a0',
+        backgroundColor: 'rgba(0,229,160,0.08)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { display: false },
+        y: {
+          min: 0,
+          grid: { color: '#242d42' },
+          ticks: { color: '#7a8ab0', font: { size: 10 }, callback: v => v + 'ms' }
+        }
+      }
+    }
+  });
+
+  const reqCtx = document.getElementById('req-chart');
+  reqChart = new Chart(reqCtx, {
+    type: 'bar',
+    data: {
+      labels: ['/', '/status', '/healthz', '/load', '/metrics'],
+      datasets: [{
+        data: [0, 0, 0, 0, 0],
+        backgroundColor: ['#00e5a0', '#4da6ff', '#9d77ff', '#ffb84d', '#ff4d6a'],
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#7a8ab0', font: { size: 10, family: 'JetBrains Mono' } } },
+        y: { min: 0, grid: { color: '#242d42' }, ticks: { color: '#7a8ab0', font: { size: 10 }, stepSize: 1 } }
+      }
+    }
+  });
+}
+
+function updateRttChart() {
+  if (!rttChart) return;
+  const data = [...Array(20 - rttHistory.length).fill(null), ...rttHistory];
+  rttChart.data.datasets[0].data = data;
+  rttChart.update('none');
+}
+
+function updateReqChart() {
+  if (!reqChart) return;
+  reqChart.data.datasets[0].data = [
+    reqCounts['/'], reqCounts['/status'], reqCounts['/healthz'],
+    reqCounts['/load'], reqCounts['/metrics']
+  ];
+  reqChart.update('none');
+}
+
+// ── Auto-refresh ───────────────────────────────────────────────────────────
+async function autoRefresh() {
+  await fetchStatus();
+  reqCounts['/']++;
+  updateReqChart();
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+initCharts();
+log('info', 'SmartScale dashboard connected');
+log('ok', 'Fetching live data from /status...');
+autoRefresh();
+setInterval(autoRefresh, 5000);   // refresh every 5 seconds
+setInterval(pingHealth, 15000);   // ping health every 15 seconds
+</script>
+</body>
+</html>

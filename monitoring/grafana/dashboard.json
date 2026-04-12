@@ -1,0 +1,142 @@
+{
+  "title": "SmartScale - Incident Response Dashboard",
+  "uid": "smartscale-main",
+  "tags": ["kubernetes", "autoscaling", "nodejs"],
+  "timezone": "browser",
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Active Pods",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "targets": [
+        {
+          "expr": "kube_deployment_status_replicas_available{namespace=\"smartscale\",deployment=\"smartscale-app\"}",
+          "legendFormat": "Available Pods"
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "thresholds": {
+          "steps": [
+            { "color": "red", "value": 0 },
+            { "color": "yellow", "value": 1 },
+            { "color": "green", "value": 2 }
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Request Rate (req/s)",
+      "type": "stat",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{job=\"smartscale-app\"}[1m]))",
+          "legendFormat": "Requests/sec"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Error Rate (%)",
+      "type": "stat",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{job=\"smartscale-app\",status_code=~\"5..\"}[5m])) / sum(rate(http_requests_total{job=\"smartscale-app\"}[5m])) * 100",
+          "legendFormat": "5xx Error %"
+        }
+      ],
+      "options": {
+        "thresholds": {
+          "steps": [
+            { "color": "green", "value": 0 },
+            { "color": "yellow", "value": 1 },
+            { "color": "red", "value": 5 }
+          ]
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "HPA Replica Count Over Time",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"smartscale\"}",
+          "legendFormat": "Current Replicas"
+        },
+        {
+          "expr": "kube_horizontalpodautoscaler_spec_min_replicas{namespace=\"smartscale\"}",
+          "legendFormat": "Min Replicas"
+        },
+        {
+          "expr": "kube_horizontalpodautoscaler_spec_max_replicas{namespace=\"smartscale\"}",
+          "legendFormat": "Max Replicas"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2 }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "CPU Usage per Pod (%)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"smartscale\",container=\"smartscale-app\"}[2m])) by (pod) * 100",
+          "legendFormat": "{{ pod }}"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Memory Usage per Pod (MB)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 20, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum(container_memory_working_set_bytes{namespace=\"smartscale\",container=\"smartscale-app\"}) by (pod) / 1024 / 1024",
+          "legendFormat": "{{ pod }}"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "P95 Request Latency by Route",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 28, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"smartscale-app\"}[5m])) by (le, route))",
+          "legendFormat": "p95 {{ route }}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "s" }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Active Connections",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 36, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "sum(active_connections{job=\"smartscale-app\"}) by (pod)",
+          "legendFormat": "{{ pod }}"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+node_modules/
+.env
+.env.*
+*.log
+npm-debug.log*
+coverage/
+.nyc_output/
+dist/
+build/
+
+# Docker
+.dockerignore
+
+# K8s secrets
+*.secret.yaml
+*secret*.yaml
+kubeconfig
+.kube/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup files from deploy script
+k8s/*.bak

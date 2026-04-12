@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartscale-app-svc
+  namespace: smartscale
+  labels:
+    app: smartscale-app
+spec:
+  type: NodePort           # Use LoadBalancer on cloud (AWS/GCP/Azure)
+  selector:
+    app: smartscale-app
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80             # Service port (cluster internal)
+      targetPort: 3000     # Pod port
+      nodePort: 30080      # External port on Minikube node

@@ -1,0 +1,87 @@
+groups:
+  - name: smartscale.app.rules
+    interval: 30s
+    rules:
+
+      # ── High CPU ──────────────────────────────────────────────────────────
+      - alert: HighCPUUsage
+        expr: |
+          (
+            sum(rate(process_cpu_seconds_total{job="smartscale-app"}[2m])) by (pod)
+            / on(pod) group_left
+            sum(kube_pod_container_resource_limits{resource="cpu", namespace="smartscale"}) by (pod)
+          ) * 100 > 80
+        for: 1m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High CPU usage on pod {{ $labels.pod }}"
+          description: "Pod {{ $labels.pod }} CPU usage is {{ $value | humanizePercentage }} — above 80% threshold."
+          runbook: "https://your-wiki/runbooks/high-cpu"
+
+      # ── Pod CrashLooping ─────────────────────────────────────────────────
+      - alert: PodCrashLooping
+        expr: |
+          increase(kube_pod_container_status_restarts_total{namespace="smartscale"}[5m]) > 3
+        for: 0m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash looping"
+          description: "Container {{ $labels.container }} in pod {{ $labels.pod }} restarted {{ $value }} times in 5 minutes."
+
+      # ── App Down ─────────────────────────────────────────────────────────
+      - alert: AppDown
+        expr: |
+          up{job="smartscale-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "SmartScale app is DOWN"
+          description: "The smartscale-app target has been unreachable for more than 1 minute."
+
+      # ── High Request Latency ─────────────────────────────────────────────
+      - alert: HighRequestLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{job="smartscale-app"}[5m])) by (le, route)
+          ) > 2
+        for: 2m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High latency on route {{ $labels.route }}"
+          description: "P95 latency on {{ $labels.route }} is {{ $value | humanizeDuration }} — above 2s threshold."
+
+      # ── HPA at Max Replicas ──────────────────────────────────────────────
+      - alert: HPAMaxReplicasReached
+        expr: |
+          kube_horizontalpodautoscaler_status_current_replicas{namespace="smartscale"}
+          >= kube_horizontalpodautoscaler_spec_max_replicas{namespace="smartscale"}
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "HPA {{ $labels.horizontalpodautoscaler }} at max replicas"
+          description: "The HPA has scaled to its maximum of {{ $value }} replicas. Consider increasing maxReplicas."
+
+      # ── High Error Rate ──────────────────────────────────────────────────
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{job="smartscale-app", status_code=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="smartscale-app"}[5m]))
+          * 100 > 5
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "High 5xx error rate"
+          description: "Error rate is {{ $value | humanizePercentage }} — above 5% threshold."
