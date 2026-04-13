@@ -1,230 +1,237 @@
-<br/>
-
-## 🌐 Live Demo
-
-🚀 **Live Application:**  
-👉 https://smart-autoscale-incident-response.onrender.com
-
-⚡ Experience:
-- Real-time auto-scaling simulation  
-- Live system metrics  
-- Self-healing behavior under load  
-
-💡 Tip: Try `/load` endpoint to trigger scaling
-
-<br/>
-
-
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=28&pause=1000&color=00E5A0&center=true&vCenter=true&width=700&lines=Smart+Auto-Scaling+System;Incident+Response+%2B+Self+Healing;Kubernetes+%2B+Prometheus+%2B+Grafana" alt="Typing SVG" />
+<img src="https://capsule-render.vercel.app/api?type=waving&height=220&color=0:0f172a,35:1d4ed8,70:06b6d4,100:10b981&text=Smart%20Auto-Scaling%20System&fontAlignY=40&desc=Incident%20Response%20%7C%20Self-Healing%20%7C%20Observability&descAlignY=62&fontColor=ffffff&animation=fadeIn" alt="Header banner" />
 
-<br/>
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=24&pause=900&color=10B981&center=true&vCenter=true&width=900&lines=Live+Node.js+incident-response+dashboard;Prometheus+metrics+%2B+Grafana+visualization;Minikube+autoscaling+lab+for+local+Kubernetes+testing;GitHub+Actions+CI%2FCD+with+Docker+Hub+and+Render+deploys" alt="Typing animation" />
 
+<br />
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-10B981?style=for-the-badge&logo=render&logoColor=white)](https://smart-autoscale-incident-response.onrender.com)
 ![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-HPA%20Autoscaling-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-Minikube%20Lab-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 
-<br/>
+<br />
 
-> A **production-grade, self-healing Kubernetes system** that monitors a Node.js application, detects high CPU load, automatically scales pods, and fires alerts — all with a live web dashboard.
+> A portfolio-ready DevOps project that combines a live Node.js dashboard, Prometheus instrumentation, Grafana visualization, Docker packaging, and a local Kubernetes autoscaling lab.
 
-<br/>
-
-[🚀 Quick Start](#-quick-start-docker-compose) • [☸️ Kubernetes Deploy](#️-kubernetes-deploy-minikube) • [📊 Monitoring](#-monitoring) • [⚡ Load Testing](#-load-testing--auto-scaling) • [🔧 CI/CD](#-cicd-pipeline) • [🛠️ Troubleshooting](#️-common-issues--fixes)
+[Live Demo](https://smart-autoscale-incident-response.onrender.com) | [Quick Start](#quick-start-docker-compose) | [Render Deploy](#deploy-to-render) | [Kubernetes Lab](#kubernetes-lab-minikube) | [Monitoring](#monitoring) | [CI/CD](#cicd-pipeline)
 
 </div>
 
 ---
 
-## 📌 What This Project Does
+## Live Demo
 
-| Feature | Details |
+Production app:
+
+`https://smart-autoscale-incident-response.onrender.com`
+
+Try these endpoints:
+
+- `/` for the dashboard UI
+- `/healthz` for a health check
+- `/status` for memory and uptime
+- `/api/info` for service metadata
+- `/load?duration=5000&intensity=100` to simulate CPU pressure
+
+## What This Project Shows
+
+| Area | What it demonstrates |
 |---|---|
-| **Live Web UI** | Dashboard at `/` showing pod name, uptime, memory, response time charts |
-| **Auto-Scaling** | HPA scales pods from 2 → 10 when CPU exceeds 50% |
-| **Self-Healing** | Kubernetes restarts crashed pods automatically via liveness probes |
-| **Zero-Downtime Deploys** | Rolling update strategy with `maxUnavailable: 0` |
-| **Metrics** | Prometheus scrapes `/metrics` every 15 seconds |
-| **Dashboards** | Grafana auto-provisioned with CPU, replica, latency panels |
-| **Alerting** | 6 alert rules → Alertmanager → local webhook receiver |
-| **CI/CD** | GitHub Actions: test → build → push Docker Hub → deploy to K8s |
+| Application | Express service with health, readiness, metrics, and load-simulation endpoints |
+| Observability | Prometheus metrics via `prom-client`, structured logs via `winston`, Grafana dashboards |
+| Containers | Multi-stage Docker build with a production runtime target |
+| Local platform lab | Minikube deployment, service exposure, HPA-based autoscaling, self-healing probes |
+| CI/CD | GitHub Actions pipeline for test, Docker image build, Docker Hub push, and Render deployment trigger |
+| Portfolio value | A single repo that shows app engineering, ops thinking, and production delivery flow |
 
----
+## Architecture
 
-## 🏗️ Architecture
+### Production path
 
-```
-                        ┌─────────────────────────────────┐
-                        │         Your Browser             │
-                        └──────────────┬──────────────────┘
-                                       │ http://IP:30080
-                        ┌──────────────▼──────────────────┐
-                        │   Kubernetes Service (NodePort)  │
-                        └──────────────┬──────────────────┘
-                                       │
-               ┌───────────────────────▼───────────────────────┐
-               │           Deployment: smartscale-app           │
-               │                                               │
-               │  ┌─────────────┐  ┌─────────────┐  ┌──────┐  │
-               │  │   Pod 1     │  │   Pod 2     │  │ ...  │  │
-               │  │ Node.js App │  │ Node.js App │  │      │  │
-               │  └─────────────┘  └─────────────┘  └──────┘  │
-               └───────────────────────┬───────────────────────┘
-                                       │
-               ┌───────────────────────▼───────────────────────┐
-               │   HPA — scales 2→10 pods when CPU > 50%       │
-               └───────────────────────────────────────────────┘
-                                       │
-          ┌────────────────────────────▼────────────────────────┐
-          │                  /metrics endpoint                   │
-          └────────────┬──────────────────────────┬─────────────┘
-                       │                          │
-          ┌────────────▼──────────┐  ┌────────────▼──────────────┐
-          │      Prometheus       │  │       Alertmanager         │
-          │  scrapes every 15s    │  │  routes alerts → webhook   │
-          └────────────┬──────────┘  └───────────────────────────┘
-                       │
-          ┌────────────▼──────────┐
-          │        Grafana        │
-          │  auto-provisioned     │
-          │  dashboards           │
-          └───────────────────────┘
+```text
+Browser
+  -> Render web service
+  -> Node.js / Express app
+  -> /metrics, /healthz, /status, /api/info, /load
 ```
 
-**CI/CD Flow:**
-```
-git push → GitHub Actions → npm test → docker build → docker push → kubectl apply → rollout ✓
+### Local observability + autoscaling lab
+
+```text
+Browser
+  -> Node.js app or Minikube service
+  -> Prometheus scrapes /metrics
+  -> Grafana visualizes dashboards
+  -> Alertmanager forwards alerts to local webhook receiver
+  -> HPA scales pods in Minikube during load tests
 ```
 
----
+### CI/CD flow
 
-## 📁 Project Structure
-
+```text
+git push
+  -> GitHub Actions test job
+  -> Docker image build
+  -> Docker Hub push
+  -> Render deploy hook
 ```
-smart-autoscale/
+
+## Project Structure
+
+```text
+smart-autoscale-project/
 ├── app/
 │   ├── src/
-│   │   ├── index.js              # Express app + Prometheus metrics
-│   │   └── public/
-│   │       └── index.html        # Live web dashboard UI
+│   │   ├── __tests__/app.test.js
+│   │   ├── public/index.html
+│   │   └── index.js
+│   ├── Dockerfile
 │   ├── package.json
-│   ├── Dockerfile                # Multi-stage, non-root, optimized
-│   └── .dockerignore
+│   └── package-lock.json
 ├── k8s/
-│   ├── namespace.yaml            # smartscale namespace
-│   ├── deployment.yaml           # Pods with probes + resource limits
-│   ├── service.yaml              # NodePort (30080)
-│   └── hpa.yaml                  # CPU/memory autoscaler (2–10 pods)
+│   ├── deployment.yaml
+│   ├── hpa.yaml
+│   ├── namespace.yaml
+│   └── service.yaml
 ├── monitoring/
-│   ├── prometheus/
-│   │   ├── prometheus-local.yml  # ← Use this for Docker Compose
-│   │   ├── prometheus.yml        # For Kubernetes (K8s service discovery)
-│   │   ├── alertmanager.yml      # Webhook-only routing (no SMTP needed)
-│   │   └── rules/alerts.yaml     # 6 alerting rules
 │   ├── grafana/
-│   │   ├── dashboard.json        # Pre-built dashboard (auto-loaded)
-│   │   └── provisioning/         # Auto-configures datasource + dashboard
-│   └── webhook/server.js         # Local alert receiver (simulates Slack)
-├── .github/workflows/ci-cd.yml   # GitHub Actions pipeline
-├── docker-compose.yml            # Full local stack
-├── load-test.sh                  # Traffic simulator (Linux/Mac)
+│   ├── prometheus/
+│   └── webhook/
+├── .github/workflows/ci-cd.yml
+├── docker-compose.yml
+├── load-test.sh
 └── README.md
 ```
 
----
+## Prerequisites
 
-## ✅ Prerequisites
+Required for the core app:
 
-| Tool | Version | Download |
-|---|---|---|
-| Node.js | 20 LTS | https://nodejs.org |
-| Docker Desktop | Latest | https://docker.com/products/docker-desktop |
-| Git | Any | https://git-scm.com |
-| Minikube | Latest | https://minikube.sigs.k8s.io/docs/start |
-| kubectl | 1.28+ | https://kubernetes.io/docs/tasks/tools |
+- Node.js 20+
+- npm
+- Docker Desktop
 
-Verify installs:
+Optional for the full local platform lab:
+
+- Minikube
+- `kubectl`
+
+Quick version check:
+
 ```bash
-node --version      # v20.x.x
-docker --version    # 24.x or higher
-minikube version    # v1.32.x
+node --version
+npm --version
+docker --version
+minikube version
 kubectl version --client
 ```
 
----
+## Quick Start (Docker Compose)
 
-## 🚀 Quick Start (Docker Compose)
-
-Runs the full stack locally — no Kubernetes needed.
+This is the fastest way to run the full local stack with the app, Prometheus, Grafana, Alertmanager, and the webhook receiver.
 
 ```bash
-# 1. Clone the repo
 git clone https://github.com/YOUR_USERNAME/smart-autoscale-incident-response.git
 cd smart-autoscale-incident-response
-
-# 2. Start everything
 docker-compose up -d
-
-# 3. Wait 30 seconds, then verify all containers show "Up"
 docker-compose ps
 ```
 
-| Service | URL | Credentials |
+Local services:
+
+| Service | URL | Notes |
 |---|---|---|
-| **Web UI + App** | http://localhost:3000 | — |
-| **Prometheus** | http://localhost:9090 | — |
-| **Grafana** | http://localhost:3001 | admin / smartscale123 |
-| **Alertmanager** | http://localhost:9093 | — |
-| **Alert Webhook** | http://localhost:5001/history | — |
+| App UI | http://localhost:3000 | Main dashboard |
+| Prometheus | http://localhost:9090 | Metrics explorer |
+| Grafana | http://localhost:3001 | `admin / smartscale123` |
+| Alertmanager | http://localhost:9093 | Alert routing |
+| Alert webhook history | http://localhost:5001/history | Alert payload viewer |
+
+Stop the stack:
 
 ```bash
-# Stop everything
 docker-compose down
+```
 
-# Stop and remove volumes (fresh start)
+Reset volumes too:
+
+```bash
 docker-compose down -v
 ```
 
----
+## Deploy to Render
 
-## ☸️ Kubernetes Deploy (Minikube)
+The live app is already deployed on Render, and this repo is a great fit for that setup because the Express app is self-contained and serves on port `3000`.
 
-> **Windows users:** Do NOT use `minikube docker-env` or `minikube image load` — these have known issues with Docker Desktop on Windows. Use the Docker Hub approach below instead. It's also how real production pipelines work.
+### Option 1: Deploy from the Render dashboard
 
-### Step 1 — Push your image to Docker Hub
+1. Create a new Web Service in Render.
+2. Connect your GitHub repo.
+3. Use these settings:
+
+| Field | Value |
+|---|---|
+| Root Directory | `app` |
+| Runtime | `Node` |
+| Build Command | `npm ci` |
+| Start Command | `node src/index.js` |
+| Environment Variable | `NODE_ENV=production` |
+| Environment Variable | `PORT=3000` |
+
+4. Deploy and open the generated Render URL.
+
+### Option 2: Auto-deploy from GitHub Actions
+
+Your intended deployment flow is:
+
+```text
+push to main -> GitHub Actions -> Docker Hub image push -> Render deploy hook
+```
+
+Add this GitHub secret in your repository settings:
+
+| Secret | Purpose |
+|---|---|
+| `RENDER_DEPLOY_HOOK_URL` | Triggers a new Render deployment after CI passes |
+
+Get it from:
+
+`Render dashboard -> your service -> Settings -> Deploy Hook`
+
+## Kubernetes Lab (Minikube)
+
+Render hosts the live app, but the Kubernetes manifests in this repo still make the project strong as a local autoscaling and self-healing demo.
+
+### 1. Build and push your image
 
 ```bash
-# Log in to Docker Hub (create free account at hub.docker.com if needed)
 docker login
-
-# Build and push — replace YOUR_USERNAME with your Docker Hub username
-docker build -t YOUR_USERNAME/smartscale-app:latest ./app
-docker push YOUR_USERNAME/smartscale-app:latest
+docker build -t YOUR_DOCKERHUB_USERNAME/smartscale-app:latest ./app
+docker push YOUR_DOCKERHUB_USERNAME/smartscale-app:latest
 ```
 
-### Step 2 — Update k8s/deployment.yaml
+### 2. Update the deployment image
 
-Open the file and update these two lines:
+Edit `k8s/deployment.yaml` and set the image to your Docker Hub repository:
 
 ```yaml
-containers:
-  - name: smartscale-app
-    image: YOUR_USERNAME/smartscale-app:latest   # ← your Docker Hub image
-    imagePullPolicy: Always                       # ← must be Always, not Never
+image: YOUR_DOCKERHUB_USERNAME/smartscale-app:latest
+imagePullPolicy: Always
 ```
 
-### Step 3 — Start Minikube
+### 3. Start Minikube
 
 ```bash
 minikube start --cpus=4 --memory=4096 --driver=docker
 minikube addons enable metrics-server
 ```
 
-### Step 4 — Deploy to Kubernetes
+### 4. Apply the manifests
 
 ```bash
 kubectl apply -f k8s/namespace.yaml
@@ -233,98 +240,55 @@ kubectl apply -f k8s/service.yaml
 kubectl apply -f k8s/hpa.yaml
 ```
 
-### Step 5 — Wait for pods to be Running
+### 5. Watch the rollout
 
 ```bash
 kubectl get pods -n smartscale -w
 ```
 
-Wait until both pods show `1/1 Running`:
-
-```
-NAME                              READY   STATUS              RESTARTS   AGE
-smartscale-app-xxxxxxx-xxxxx     0/1     ContainerCreating   0          8s
-smartscale-app-xxxxxxx-xxxxx     1/1     Running             0          25s
-smartscale-app-xxxxxxx-xxxxx     1/1     Running             0          26s
-```
-
-Press `Ctrl+C` when both show Running.
-
-### Step 6 — Open the app
+### 6. Open the service
 
 ```bash
 minikube service smartscale-app-svc -n smartscale
 ```
 
-Your browser opens to the **live dashboard UI**.
-
----
-
-## 🔄 Every Time You Restart Your Computer
-
-```bash
-# 1. Start Minikube
-minikube start
-
-# 2. Check pod status
-kubectl get pods -n smartscale
-
-# 3a. If pods show Running — get the URL
-minikube service smartscale-app-svc -n smartscale
-
-# 3b. If pods are missing — redeploy
-kubectl apply -f k8s/
-```
-
-## 🔄 After Changing App Code
-
-```bash
-# Rebuild and push new image
-docker build -t YOUR_USERNAME/smartscale-app:latest ./app
-docker push YOUR_USERNAME/smartscale-app:latest
-
-# Rolling restart (zero downtime)
-kubectl rollout restart deployment/smartscale-app -n smartscale
-kubectl rollout status deployment/smartscale-app -n smartscale
-```
-
----
-
-## 🌐 API Endpoints
+## API Endpoints
 
 | Endpoint | Description |
 |---|---|
-| `GET /` | **Live web dashboard UI** |
-| `GET /api/info` | Service name, pod, version (JSON) |
-| `GET /status` | Memory, heap, uptime, PID (JSON) |
-| `GET /load?duration=5000&intensity=100` | CPU burn — triggers HPA scaling |
-| `GET /healthz` | Liveness probe → `{"status":"ok"}` |
-| `GET /ready` | Readiness probe → `{"ready":true}` |
-| `GET /metrics` | Prometheus metrics (scraped every 15s) |
+| `GET /` | Dashboard UI |
+| `GET /healthz` | Health probe |
+| `GET /ready` | Readiness probe |
+| `GET /api/info` | Service metadata |
+| `GET /status` | Runtime, memory, and uptime information |
+| `GET /load?duration=5000&intensity=100` | CPU load simulation |
+| `GET /metrics` | Prometheus metrics |
 
----
+## Load Testing
 
-## ⚡ Load Testing & Auto-Scaling
+For the Kubernetes demo, open separate terminals and watch scaling happen while you generate traffic.
 
-Open **3 terminals side by side** to watch scaling happen live.
+Watch HPA:
 
-**Terminal 1 — Watch HPA:**
 ```bash
 kubectl get hpa -n smartscale -w
 ```
 
-**Terminal 2 — Watch pods:**
+Watch pods:
+
 ```bash
 kubectl get pods -n smartscale -w
 ```
 
-**Terminal 3 — Run load (Linux/Mac):**
+Run Linux or macOS load:
+
 ```bash
 chmod +x load-test.sh
 ./load-test.sh http://$(minikube ip):30080 20 120
 ```
 
-**Terminal 3 — Run load (Windows PowerShell):**
+Run Windows PowerShell load:
+
 ```powershell
 $IP = minikube ip
 1..15 | ForEach-Object {
@@ -337,235 +301,127 @@ $IP = minikube ip
     }
   } -ArgumentList $IP
 }
-Write-Host "Load running — watch Terminal 1 for HPA scaling!"
+Write-Host "Load running. Watch HPA and pods in the other terminals."
 ```
 
-**Or use the built-in UI** — go to `http://IP:30080`, scroll to "Load Simulator" and click **Run load test**.
+## Monitoring
 
-### Expected scaling behavior:
+### Prometheus
 
-```
-NAME             TARGETS     MINPODS   MAXPODS   REPLICAS
-smartscale-hpa   18%/50%     2         10        2        ← idle
-smartscale-hpa   74%/50%     2         10        2        ← load hits
-smartscale-hpa   74%/50%     2         10        4        ← HPA adds 2 pods
-smartscale-hpa   89%/50%     2         10        6        ← still high
-smartscale-hpa   41%/50%     2         10        6        ← cooling
-smartscale-hpa   18%/50%     2         10        2        ← scaled back (5m window)
-```
+Open:
 
----
+`http://localhost:9090`
 
-## 📊 Monitoring
+Useful queries:
 
-### Prometheus (http://localhost:9090)
-
-Click **Status → Targets** — `smartscale-app` should show state **UP**.
-
-Useful queries to try:
 ```promql
-# Request rate per second
 sum(rate(http_requests_total{job="smartscale-app"}[1m]))
+```
 
-# P95 response latency
+```promql
 histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+```
 
-# Active connections
+```promql
 active_connections{job="smartscale-app"}
-
-# Total requests by endpoint
-http_requests_total{job="smartscale-app"}
 ```
 
-### Grafana (http://localhost:3001)
+### Grafana
 
-Login: `admin` / `smartscale123`
+Open:
 
-The **SmartScale - Incident Response Dashboard** loads automatically. No manual setup. Panels include:
-- Active pods count
-- Request rate (req/s)
-- Error rate (%)
-- HPA replica count over time
-- CPU usage per pod
-- Memory usage per pod
-- P95 latency by route
-- Active connections
+`http://localhost:3001`
 
-### Alert Webhook (http://localhost:5001/history)
+Login:
 
-View all alerts that Alertmanager has fired. Each entry shows severity, alert name, description, and timestamp.
+`admin / smartscale123`
 
----
+The dashboard is auto-provisioned from the files in `monitoring/grafana/`.
 
-## 🚨 Alert Rules
+### Alert Webhook
 
-| Alert | Condition | Severity |
-|---|---|---|
-| `HighCPUUsage` | CPU > 80% for 1 minute | ⚠️ warning |
-| `PodCrashLooping` | > 3 restarts in 5 minutes | 🔴 critical |
-| `AppDown` | Target unreachable for 1 minute | 🔴 critical |
-| `HighRequestLatency` | P95 > 2s for 2 minutes | ⚠️ warning |
-| `HPAMaxReplicasReached` | At max replicas for 5 minutes | ⚠️ warning |
-| `HighErrorRate` | 5xx rate > 5% for 2 minutes | 🔴 critical |
+Open:
 
----
+`http://localhost:5001/history`
 
-## 🔧 CI/CD Pipeline
+This shows the alert payloads received from Alertmanager.
 
-### Required GitHub Secrets
+## CI/CD Pipeline
 
-Go to your repo → **Settings → Secrets and variables → Actions → New repository secret**:
+The README now reflects the updated deployment direction: Render for the live app, Docker Hub for container publishing, and Minikube as a local lab rather than a CI deployment target.
 
-| Secret | How to get it |
+Expected stages:
+
+```text
+test -> build Docker image -> push to Docker Hub -> trigger Render deploy
+```
+
+Repository secrets you said you are using:
+
+| Secret | Purpose |
 |---|---|
-| `DOCKERHUB_USERNAME` | Your Docker Hub username |
-| `DOCKERHUB_TOKEN` | Docker Hub → Account Settings → Security → New Access Token |
-| `KUBECONFIG_BASE64` | See command below |
+| `SECRET` | Docker Hub username |
+| `DOCKERTOKEN` | Docker Hub access token |
+| `KUBECONFIGSECRET` | Optional kubeconfig for manual or experimental cluster-based deploys |
+| `RENDER_DEPLOY_HOOK_URL` | Render deployment trigger |
 
-**Get kubeconfig as base64:**
-```bash
-# Mac/Linux
-cat ~/.kube/config | base64
+If you keep the Kubernetes section in the workflow later, use it only for a real remote cluster, not a local Minikube kubeconfig from your laptop.
 
-# Windows PowerShell
-[Convert]::ToBase64String([System.IO.File]::ReadAllBytes("$env:USERPROFILE\.kube\config"))
-```
+## Troubleshooting
 
-### Trigger the pipeline
+<details>
+<summary><b>ESLint fails in CI</b></summary>
 
-```bash
-git add .
-git commit -m "feat: trigger CI pipeline"
-git push origin main
-```
+`app/package.json` has a lint script, but `eslint` is not currently listed in `devDependencies`. Either add ESLint properly or remove the lint step from the workflow until you want to enforce linting.
+</details>
 
-Go to your repo → **Actions tab** to watch it run.
+<details>
+<summary><b>Minikube image pull fails</b></summary>
 
-### Pipeline stages
+Make sure `k8s/deployment.yaml` points to the exact Docker Hub image you pushed and that `imagePullPolicy` is `Always`.
+</details>
 
-```
-[test]        npm ci → lint → jest tests
-     ↓
-[build-push]  docker buildx (amd64 + arm64) → push to Docker Hub
-     ↓
-[deploy]      kubectl apply → rollout status → verify pods healthy
-```
+<details>
+<summary><b>Render deploy works locally but not from CI</b></summary>
+
+Double-check that `RENDER_DEPLOY_HOOK_URL` is added in GitHub Actions secrets and that the service is configured with `app` as the root directory.
+</details>
+
+<details>
+<summary><b>GitHub Actions fails immediately on workflow parsing</b></summary>
+
+Do not reference `secrets.*` directly inside a job-level `if:` expression. Validate secrets inside steps instead.
+</details>
+
+<details>
+<summary><b>Local kubeconfig fails in GitHub Actions</b></summary>
+
+A Minikube kubeconfig from Windows usually contains local certificate file paths that do not exist on the GitHub-hosted Linux runner. Use a real remote cluster config if you add cluster deploys to CI.
+</details>
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Node.js 20, Express |
+| Metrics | `prom-client` |
+| Logging | `winston` |
+| Testing | Jest |
+| Containers | Docker |
+| Orchestration lab | Kubernetes, Minikube, HPA |
+| Monitoring | Prometheus, Grafana, Alertmanager |
+| Automation | GitHub Actions |
+| Hosting | Render |
+| Registry | Docker Hub |
 
 ---
-
-## 🛠️ Common Issues & Fixes
-
-<details>
-<summary><b>🔴 ErrImageNeverPull</b></summary>
-
-**Cause:** `imagePullPolicy: Never` is set but the image isn't inside Minikube's internal Docker daemon.
-
-**Fix:** Change `imagePullPolicy` to `Always` in `k8s/deployment.yaml`, push your image to Docker Hub, and redeploy:
-```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl delete pods -n smartscale --all
-```
-</details>
-
-<details>
-<summary><b>🔴 ImagePullBackOff</b></summary>
-
-**Cause:** The image name in `deployment.yaml` doesn't match what was pushed to Docker Hub.
-
-**Fix:** Check your exact repo name on hub.docker.com and update:
-```yaml
-image: YOUR_EXACT_USERNAME/YOUR_EXACT_REPO_NAME:latest
-```
-Then: `kubectl apply -f k8s/deployment.yaml && kubectl delete pods -n smartscale --all`
-</details>
-
-<details>
-<summary><b>🔴 SVC_UNREACHABLE — no running pod found</b></summary>
-
-**Cause:** You ran `minikube service` before pods reached `Running` state.
-
-**Fix:** Always check pods first:
-```bash
-kubectl get pods -n smartscale
-# Wait for 1/1 Running, THEN run:
-minikube service smartscale-app-svc -n smartscale
-```
-</details>
-
-<details>
-<summary><b>🔴 Alertmanager keeps restarting</b></summary>
-
-**Cause:** Old config had an email (SMTP) receiver pointing at Gmail with fake credentials.
-
-**Fix:** The `alertmanager.yml` in this repo uses webhook-only receivers — no email config needed. Make sure you have the latest file, then:
-```bash
-docker-compose down -v
-docker-compose up -d
-```
-</details>
-
-<details>
-<summary><b>🔴 App container is "unhealthy"</b></summary>
-
-**Cause:** Old Dockerfile used `wget` for the healthcheck, which isn't installed in `node:20-alpine`.
-
-**Fix:** The `Dockerfile` in this repo uses `node -e "require('http').get(...)"` instead. Rebuild:
-```bash
-docker-compose down
-docker-compose up -d --build
-```
-</details>
-
-<details>
-<summary><b>🔴 minikube image load fails on Windows</b></summary>
-
-**Cause:** Docker Desktop on Windows uses the containerd image store, which is incompatible with `minikube image load` and `minikube docker-env`.
-
-**Fix:** Use Docker Hub (see [Kubernetes Deploy](#️-kubernetes-deploy-minikube) section). Set `imagePullPolicy: Always` and push your image — Kubernetes will pull it directly.
-</details>
-
-<details>
-<summary><b>🔴 HPA shows "unknown" for CPU target</b></summary>
-
-**Cause:** The metrics-server addon isn't running.
-
-**Fix:**
-```bash
-minikube addons enable metrics-server
-kubectl rollout restart deployment/metrics-server -n kube-system
-# Wait 60 seconds, then check:
-kubectl get hpa -n smartscale
-```
-</details>
-
----
-
-## 🧰 Tech Stack
-
-| Layer | Technology | Purpose |
-|---|---|---|
-| Application | Node.js 20 + Express | REST API + web dashboard UI |
-| Metrics | prom-client | Prometheus metrics exposure |
-| Logging | winston (JSON structured) | Searchable logs |
-| Container | Docker (multi-stage) | Optimized, non-root image (144MB) |
-| Orchestration | Kubernetes via Minikube | Pod scheduling + self-healing |
-| Autoscaling | HPA v2 (CPU + memory) | 2→10 pods on load |
-| Monitoring | Prometheus 2.48 | Metrics collection + alerting |
-| Alerting | Alertmanager 0.26 | Alert routing + deduplication |
-| Dashboards | Grafana 10.2 | Visualization |
-| CI/CD | GitHub Actions | Automated build + deploy pipeline |
-| Registry | Docker Hub | Public image storage |
-
----
-
-
 
 <div align="center">
 
 ### Built as a DevOps portfolio project
 
-Node.js · Docker · Kubernetes · Prometheus · Grafana · GitHub Actions
+Node.js | Docker | Kubernetes | Prometheus | Grafana | GitHub Actions | Render
 
-**⭐ Star this repo if it helped you learn DevOps!**
+If this project helped you, a star on the repo goes a long way.
 
 </div>
