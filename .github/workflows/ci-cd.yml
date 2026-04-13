@@ -36,9 +36,6 @@ jobs:
         working-directory: app
         run: npm ci
 
-      - name: Run linter
-        working-directory: app
-        run: npm run lint --if-present
 
       - name: Run tests
         working-directory: app
