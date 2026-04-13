@@ -1,3 +1,20 @@
+<br/>
+
+## 🌐 Live Demo
+
+🚀 **Live Application:**  
+👉 https://smart-autoscale-incident-response.onrender.com
+
+⚡ Experience:
+- Real-time auto-scaling simulation  
+- Live system metrics  
+- Self-healing behavior under load  
+
+💡 Tip: Try `/load` endpoint to trigger scaling
+
+<br/>
+
+
 <div align="center">
 
 <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=28&pause=1000&color=00E5A0&center=true&vCenter=true&width=700&lines=Smart+Auto-Scaling+System;Incident+Response+%2B+Self+Healing;Kubernetes+%2B+Prometheus+%2B+Grafana" alt="Typing SVG" />
